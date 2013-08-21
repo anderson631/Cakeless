@@ -41,4 +41,20 @@ class CakelessComponent extends Component {
 	}
 
 
+	/**
+	 * Compiles a LESS syntax file and saves the compiled version, only if a change was made
+	 */
+	public function cachedCompile($inputFile, $outputFile) {
+		$cacheFile = $inputFile . '.cache'; // load the cache
+
+		if(file_exists($cacheFile)) $cache = unserialize(file_get_contents($cacheFile));
+		else $cache = $inputFile;
+
+		$newCache = $less->cachedCompile($cache);
+
+		if(!is_array($cache) || $newCache['updated'] > $cache['updated']) {
+			file_put_contents($cacheFile, serialize($newCache));
+			file_put_contents($outputFile, $newCache['compiled']);
+		}
+	}
 }
